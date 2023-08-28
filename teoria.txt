@@ -1,0 +1,129 @@
+**Diferentes formas de definir un componente
+    La forma en la que se trabajan los componentes en TypeScript con React es con 
+    la extensión .tsx. (archivos de TypeScript que incluyen JSX).
+
+    Hay distintas formas de definir un componente en React con TypeScript, veamos 
+    las 4 formas más comunes de hacer esto:
+
+    **// Forma implícito (JSX:Element)**
+    const MyComponent = () => {
+      return (
+        <div>
+          <h1>Hola!</h1>
+        </div>
+      )
+    }
+
+    **// Forma explícita "JSX.Element"**
+    const MyComponent = (): JSX.Element => {
+      return (
+        <div>
+          <h1>Hola!</h1>
+        </div>
+      )
+    }
+
+    **// Usando tipos de React "FunctionComponent"**
+    import type { FunctionComponente } from "react"
+    ****
+    const MyComponent: FunctionComponent = () => {
+      return (
+        <div>
+          <h1>Hola!</h1>
+        </div>
+      )
+    }
+
+    **// Usando tipos de React "FC"**
+    import type { FC } from "react"
+    ****
+    const MyComponent: FC = () => {
+      return (
+        <div>
+          <h1>Hola!</h1>
+        </div>
+      )
+    }
+    Hoy en día, el estándar que se manera comúnmente es la segunda manera 
+    Forma explícita "JSX.Element", este es el formato de que debemos utilizar.
+
+    https://github.com/facebook/create-react-app/pull/8177 
+
+ ** El objeto props y children  
+
+  Para poder usar las props con TSX primero tenemos que tipar el objeto de props. 
+  Lo hacemos asignándole un tipo por cada prop que tengamos, y para hacerlo mas 
+  mantenible, separamos esos tipos en un objeto aparte 
+  (ya sea con type o interface).
+
+  // RandomFox.tsx
+      type Props = {
+        image: string;
+        alt: string;
+        // another prop
+      };
+    export const RandomFox = ({ image, alt }: Props): JSX.Element => {
+    // Lo que hicimos fue desestructurar el objeto props para 
+    // quedarnos solo con lo que necesitamos (image y alt)
+      return (
+        <img width={320} height='auto' src={image} alt={alt} className='rounded' />
+      );
+    };
+
+   //Con interface
+   interface Props {
+    image: string;
+  }
+
+  export const RandomFox = ({ image }: Props): JSX.Element => {
+    return <img className="rounded" width={320} height="auto" src={image} />;
+  }; 
+
+***State con tipos primitivos
+    Los estados pueden recibir tipos de datos primitivos como un string, number, 
+    boolean.
+
+    Para esta oportunidad vamos a ver que el hook de react useState, tiene un 
+    generador (generator) que permite saber qué va a inferir su motor de 
+    interpretación.
+
+    function useState<S>(initialState: S | (() => S)): [S, Dispatch<SetStateAction<S>>];
+        // convenience overload when first argument is omitted
+        /**
+        * Returns a stateful value, and a function to update it.
+        *
+        * @version 16.8.0
+        * @see https://reactjs.org/docs/hooks-reference.html#usestate
+        */
+    La <S> quiere referirse a la inicial del state (estado). En pocas palabras: es 
+    una variable que recibe y asigna.
+
+    En nuestro proyecto, vamos a hacer este ejemplo con varias imágenes que vamos 
+    a recibir.
+
+    Necesitamos hacer importación del hook de react: useState
+
+    import { useState } from "react";
+    Después creamos el array que va a recibir:
+
+    const [images, setImages] = useState<Array<string>>([
+        `https://randomfox.ca/images/${randomNumber()}.jpg`,
+        `https://randomfox.ca/images/${randomNumber()}.jpg`,
+        `https://randomfox.ca/images/${randomNumber()}.jpg`,
+        `https://randomfox.ca/images/${randomNumber()}.jpg`,
+      ]);
+    Y por último en el componente principal, como TypeScript ya sabe que el valor 
+    del estado y conoce que es un array; podemos utilizar todos los métodos 
+    del array:
+
+    return(
+    ...
+    <main>
+            <h1 className="text-3xl font-bold underline">Hello world!</h1>
+            {images.map((image, index) => (
+              <div key={index} className="p-4">
+                <RandomFox image={image} />
+              </div>
+            ))}
+          </main>
+    )

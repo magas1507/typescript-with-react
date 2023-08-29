@@ -127,3 +127,155 @@
             ))}
           </main>
     )
+
+***STATE CON OTROS TIPOS
+      Generalmente como respuesta de un api no es un Array, si no mas bien son 
+      objetos JSON.
+
+      Vamos a simular que recibimos un objeto con un id y un url con la imagen 
+      zorros. Para generar una id única vamos a utilizar el siguiente código.
+
+      // generate simple unique id
+      const generateId = (): string => {
+        return (
+          Math.random().toString(36).substring(2, 15) +
+          Math.random().toString(36).substring(2, 15)
+        );
+      };
+
+      Ahora debemos cambiar el generator de useState de tipo Array al tipo 
+      ImageItems( un Array de objetos con un id: string y ulr:string)
+
+      type ImageItems =Array<{id:string, url:string}>
+
+      const Home: NextPage = () => {
+
+        const [images, setImages] = useState<ImageItems>([
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+        ]);
+
+        return (
+
+      También podríamos generar el tipo ImageItem (sin el plural), que seria la 
+      mínima representación del objeto que queremos tipar. un objeto singular con 
+      id: string y url: string
+
+      type ImageItem = {id:string, url:string}
+
+      const Home: NextPage = () => {
+
+        const [images, setImages] = useState<Array<ImageItem>>([
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+          {id:generateId(), url:`https://randomfox.ca/images/${randomNumber()}.jpg` },
+        ]);
+
+        return (
+
+      Hacerlo de esta manera nos da la ventaja al momento de utilizar el metodo 
+      map. TypeScript sabrá que la unidad es de tipo ImageItem.
+      
+      OJO: Recuerda que ahora nuestro estado este compuesto de 2 valores. 
+      Entonces debes declarar el valor de image.url y el image. id para los pasar 
+      las props al componente RamdomFox o desestructurar los valores para obtener 
+      la url y el id
+
+            <main >
+              {images.map(({id, url}) => (
+                <div key={id} className="p-4">
+                  <RandomFox image={url} alt={`fox`}/>
+                </div>
+              ))}
+            </main>
+
+***Tipos para eventos y callbacks de escuchadores
+
+  A medida que desarrollamos aplicaciones en TypeScript, una de las tareas más importantes es 
+  asegurarnos de que estamos trabajando con tipos de datos precisos y seguros. 
+
+  Esto es particularmente importante cuando trabajamos con eventos y callbacks de escuchadores 
+  en React, ya que necesitamos especificar el tipo de evento que se está produciendo.
+
+  Afortunadamente, muchas librerías y frameworks modernos ya proporcionan tipos de datos 
+  precisos y completos para eventos. 
+
+  Esto significa que podemos confiar en que las funciones que estamos utilizando son seguras 
+  y precisas.
+
+  Para asegurarnos de que estamos utilizando los tipos de datos correctos para eventos, 
+  necesitamos asegurarnos de que nuestra configuración de TypeScript incluya las librerías 
+  que estamos utilizando. 
+
+  Podemos hacer esto especificando las librerías que estamos usando en nuestro archivo 
+
+  tsconfig.json.
+
+  {
+    "compilerOptions": {
+      ...
+      **"lib": ["DOM", "DOM.Iterable", "ESNext"]**, // especificamos las librerías que usamos
+      ...
+    },
+    ...
+  }
+  Una vez que hemos configurado nuestro proyecto correctamente, podemos inspeccionar los tipos 
+  de eventos utilizando el editor de código que estemos utilizando. 
+
+  Por ejemplo, si queremos saber el tipo de datos que se produce en un evento onClick de un 
+  botón, podemos simplemente hacer hover sobre el método onClick y buscar su definición.
+
+  El editor de código nos mostrará la definición del método onClick, junto con información 
+  sobre su tipo de datos:
+
+  En este caso, el tipo de datos del evento es React.MouseEvent<HTMLButtonElement>. 
+
+  Esto significa que podemos utilizar este tipo de datos para especificar el tipo de datos 
+  que se produce en nuestro callback de escuchador de eventos.
+
+  Por ejemplo, podemos definir una función addNewFox que se llama cuando se hace clic en un 
+  botón. 
+
+  Para especificar el tipo de datos del evento que se produce, podemos incluir 
+  React.MouseEvent<HTMLButtonElement> como argumento de nuestra función:
+
+    function App(): JSX.Element {
+      const addNewFox = (**event: React.MouseEvent<HTMLButtonElement>**): void => {
+        event.preventDefault()
+        const target = event.target
+
+        // ...
+      }
+
+      return (
+        // JSX del componente App...
+      )
+    }
+  En este ejemplo, la función addNewFox toma un argumento de tipo 
+
+    React.MouseEvent<HTMLButtonElement>. 
+  Esto nos permite acceder a las propiedades del evento de manera segura y precisa, sin 
+  tener que utilizar tipos de datos genéricos como any.
+
+  También, podemos hacer la importación de los tipos de manera directa:
+
+    // importación del tipo desde React
+    import type { MouseEvent } from "react"
+
+    function App(): JSX.Element {
+      // Evitamos escribir de donde viene "React"
+      const addNewFox = (event: MouseEvent<HTMLButtonElement>): void => {
+        event.preventDefault()
+        const target = event.target
+
+        // ...
+      }
+
+      return (
+        // JSX del componente App...
+      )
+    }
+    Esto dependerá bastante de la librería que estemos usando junto con React.
